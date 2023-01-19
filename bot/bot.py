@@ -1,15 +1,23 @@
 import json
+import time
 from infrastructure.log_wrapper import LogWrapper
 from models.trade_settings import TradeSettings
+from api.oanda_api import OandaApi
+from bot.candle_manager import CandleManager
 
 class Bot:
 
     ERROR_LOG = "error"
     MAIN_LOG = "main"
+    GRANULARITY = "M1"
+    SLEEP = 5
 
     def __init__(self):
         self.load_settings()
         self.setup_logs()
+
+        self.api = OandaApi()
+        self.candle_manager = CandleManager(self.api, self.trade_settings, self.log_message, Bot.GRANULARITY)
     
 
     def load_settings(self):
@@ -37,3 +45,15 @@ class Bot:
     
     def log_to_error(self, msg):
         self.log_message(msg, Bot.ERROR_LOG)
+
+    def process_candles(self, triggered):
+        if len(triggered) > 0:
+            self.log_message(f"process_candles triggered: {triggered}", Bot.MAIN_LOG)
+
+            for p in triggered:
+                pass
+
+    def run(self):
+        while True:
+            self.process_candles(self.candle_manager.update_timings())
+            time.sleep(Bot.SLEEP)
