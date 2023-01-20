@@ -7,7 +7,7 @@ from bot.trade_manager import place_trade
 from infrastructure.log_wrapper import LogWrapper
 from models.trade_settings import TradeSettings
 from api.oanda_api import OandaApi
-import constants.defs as defs
+import constants.secrets as defs
 
 
 

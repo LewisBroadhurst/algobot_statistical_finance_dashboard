@@ -1,8 +1,7 @@
 import requests
 import pandas as pd
 import json
-import constants.defs as defs
-
+import constants.secrets as defs
 from dateutil import parser
 from datetime import datetime as dt
 from infrastructure.instrument_collection import instrumentCollection as ic

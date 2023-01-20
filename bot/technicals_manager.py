@@ -1,15 +1,12 @@
 import pandas as pd
 from models.trade_decision import TradeDecision
-
+from api.oanda_api import OandaApi
+from models.trade_settings import TradeSettings
+import constants.secrets as defs
 from technicals.indicators import BollingerBands
 
 pd.set_option('display.max_columns', None)
 pd.set_option('expand_frame_repr', False)
-
-
-from api.oanda_api import OandaApi
-from models.trade_settings import TradeSettings
-import constants.defs as defs
 
 ADDROWS = 20
 
