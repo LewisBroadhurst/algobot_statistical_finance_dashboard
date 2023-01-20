@@ -6,6 +6,7 @@ from dateutil import parser
 from datetime import datetime as dt
 from infrastructure.instrument_collection import instrumentCollection as ic
 from models.open_trade import OpenTrade
+from models.api_price import ApiPrice
 
 
 class OandaApi:
