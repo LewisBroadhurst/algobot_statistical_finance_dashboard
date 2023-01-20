@@ -7,6 +7,7 @@ from datetime import datetime as dt
 from infrastructure.instrument_collection import instrumentCollection as ic
 from models.open_trade import OpenTrade
 
+
 class OandaApi:
 
     def __init__(self):
@@ -15,7 +16,7 @@ class OandaApi:
             "Authorization": f"Bearer {defs.API_KEY}",
             "Content-Type": "application/json"
         })
-    
+
     def make_request(self, url, verb='get', code=200, params=None, data=None, headers=None):
         full_url = f"{defs.OANDA_URL}/{url}"
 
@@ -33,8 +34,8 @@ class OandaApi:
 
             if verb == "put":
                 response = self.session.put(full_url, params=params, data=data, headers=headers)
-            
-            if response == None:
+
+            if response is None:
                 return False, {'error': 'verb not found'}
 
             if response.status_code == code:
@@ -44,34 +45,30 @@ class OandaApi:
 
         except Exception as error:
             return False, {'exception': error}
-    
 
     def get_account_endpoint(self, endpoint, data_key):
         url = f"accounts/{defs.ACCOUNT_ID}/{endpoint}"
 
         ok, data = self.make_request(url)
 
-        if ok == True and data_key in data:
+        if ok is True and data_key in data:
             return data[data_key]
         else:
             print("Error, get_account_endpoint()", data)
             return None
 
-
     def get_account_summary(self):
         return self.get_account_endpoint("summary", "account")
 
-
     def get_account_instruments(self):
         return self.get_account_endpoint("instruments", "instruments")
-    
 
-    def fetch_candles(self, pair_name, count=10, granularity="H1", price = "MBA", date_from = None, date_to = None):
-    
+    def fetch_candles(self, pair_name, count=10, granularity="H1", price="MBA", date_from=None, date_to=None):
+
         url = f"instruments/{pair_name}/candles"
         params = dict(
-            granularity = granularity,
-            price = price
+            granularity=granularity,
+            price=price
         )
 
         if date_from is not None and date_to is not None:
@@ -80,15 +77,14 @@ class OandaApi:
             params["to"] = dt.strftime(date_to, date_format)
         else:
             params["count"] = count
-        
+
         ok, data = self.make_request(url, params=params)
 
-        if ok == True and 'candles' in data:
+        if ok is True and 'candles' in data:
             return data['candles']
         else:
             print("Error, fetch_candles()", params, data)
             return None
-
 
     def get_candles_df(self, pair_name, **kwargs):
 
@@ -96,21 +92,22 @@ class OandaApi:
 
         if data is None:
             return None
-        
+
         if len(data) == 0:
             return pd.DataFrame()
-        
+
         prices = ['mid', 'bid', 'ask']
         ohlc = ['o', 'h', 'l', 'c']
-        
+
         final_data = []
-    
+
         for candle in data:
-            if candle['complete'] == False:
+            if candle['complete'] is False:
                 continue
-            new_dict = {}
-            new_dict['time'] = parser.parse(candle['time'])
-            new_dict['volume'] = candle['volume']
+            new_dict = {
+                'time': parser.parse(candle['time']),
+                'volume': candle['volume']
+            }
 
             for p in prices:
                 if p in candle:
@@ -118,11 +115,9 @@ class OandaApi:
                         new_dict[f"{p}_{o}"] = float(candle[p][o])
 
             final_data.append(new_dict)
-                
-        df = pd.DataFrame.from_dict(final_data)
-        
-        return df
 
+        df = pd.DataFrame.from_dict(final_data)
+        return df
 
     def last_complete_candle(self, pair_name, granularity):
         df = self.get_candles_df(pair_name, granularity=granularity, count=10)
@@ -132,8 +127,9 @@ class OandaApi:
 
         return df.iloc[-1].time
 
-    def place_trade(self, pair_name: str, units: float, direction: int, stop_loss: float = None, take_profit: float = None):
-        
+    def place_trade(self, pair_name: str, units: float, direction: int, stop_loss: float = None,
+                    take_profit: float = None):
+
         url = f"accounts/{defs.ACCOUNT_ID}/orders"
         instrument = ic.instruments_dict[pair_name]
         units = round(units, instrument.tradeUnitsPrecision)
@@ -142,33 +138,24 @@ class OandaApi:
             units = units * -1
 
         data = dict(
-            order = dict(
-                units = str(units),
-                instrument = pair_name,
-                type = "MARKET"
+            order=dict(
+                units=str(units),
+                instrument=pair_name,
+                type="MARKET"
             )
         )
 
         if stop_loss is not None:
-            sld = dict(
-                price = str(round(stop_loss, instrument.displayPrecision)
-            ))
+            sld = dict(price=str(round(stop_loss, instrument.displayPrecision)))
             data["order"]["stopLossOnFill"] = sld
 
-
         if take_profit is not None:
-            tpd = dict(
-                price = str(round(take_profit, instrument.displayPrecision)
-            ))
+            tpd = dict(price=str(round(take_profit, instrument.displayPrecision)))
             data["order"]["takeProfitOnFill"] = tpd
 
-        print(data)
+        ok, response = self.make_request(url, verb="post", data=data, code=201)
 
-        ok, response = self.make_request(url, verb="post", data = data, code = 201)
-
-        print(ok, response)
-
-        if ok == True and 'orderFillTransaction' in response:
+        if ok is True and 'orderFillTransaction' in response:
             return response["orderFillTransaction"]["id"]
         else:
             return None
@@ -178,24 +165,38 @@ class OandaApi:
 
         ok, _ = self.make_request(url, verb='put', code=200)
 
-        if ok == True:
+        if ok is True:
             print(f"Closed {trade_id} successfully.")
         else:
             print(f"Failed to close trade {trade_id}")
-        
+
         return ok
-    
 
     def get_open_trade(self, trade_id):
         url = f"accounts/{defs.ACCOUNT_ID}/trades/{trade_id}"
         ok, response = self.make_request(url)
 
-        if ok == True and 'trade' in response:
+        if ok is True and 'trade' in response:
             return OpenTrade(response['trade'])
 
     def get_open_trades(self):
         url = f"accounts/{defs.ACCOUNT_ID}/openTrades"
         ok, response = self.make_request(url)
 
-        if ok == True and 'trades' in response:
+        if ok is True and 'trades' in response:
             return [OpenTrade(x) for x in response['trades']]
+
+    def get_prices(self, instruments_list):
+        url = f"accounts/{defs.ACCOUNT_ID}/pricing"
+
+        params = dict(
+            instruments=','.join(instruments_list),
+            includeHomeConversions=True
+        )
+
+        ok, response = self.make_request(url, params=params)
+
+        if ok is True and 'prices' in response and 'homeConversions' in response:
+            return [ApiPrice(x, response['homeConversions']) for x in response['prices']]
+
+        return None

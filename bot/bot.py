@@ -5,6 +5,7 @@ from models.trade_settings import TradeSettings
 from api.oanda_api import OandaApi
 from bot.candle_manager import CandleManager
 from bot.technicals_manager import get_trade_decision
+from bot.trade_manager import place_trade
 from constants import secrets as defs
 
 class Bot:
@@ -20,13 +21,11 @@ class Bot:
 
         self.api = OandaApi()
         self.candle_manager = CandleManager(self.api, self.trade_settings, self.log_message, Bot.GRANULARITY)
-    
 
     def load_settings(self):
         with open("./bot/settings.json", "r") as f:
             data = json.loads(f.read())
             self.trade_settings = { k: TradeSettings(v, k) for k, v in data.items() }
-
 
     def setup_logs(self):
         self.logs = {}
@@ -37,10 +36,8 @@ class Bot:
         self.logs[Bot.MAIN_LOG] = LogWrapper(Bot.MAIN_LOG)
         self.log_to_main(f"Bot started with {TradeSettings.settings_to_str(self.trade_settings)}")
 
-
     def log_message(self, msg, key):
         self.logs[key].logger.debug(msg)
-    
 
     def log_to_main(self, msg):
         self.log_message(msg, Bot.MAIN_LOG)
@@ -50,17 +47,24 @@ class Bot:
 
     def process_candles(self, triggered):
         if len(triggered) > 0:
-            self.log_message(f"process_candles triggered: {triggered}", Bot.MAIN_LOG)
+            self.log_message(f"process_candles triggered:{triggered}", Bot.MAIN_LOG)
 
             for p in triggered:
                 last_time = self.candle_manager.timings[p].last_time
-                trade_decision = get_trade_decision(last_time, p, Bot.GRANULARITY, self.api, self.trade_settings[p], self.log_message)
+                trade_decision = get_trade_decision(last_time, p, Bot.GRANULARITY, self.api,
+                                                    self.trade_settings[p], self.log_message)
 
-                if trade_decision is not None and trade_decision.signal != defs.NO_TRADE:
-                    self.log_message(f"Place trade: {trade_decision}", p)
-                    self.log_to_main(f"Place trade: {trade_decision}", p)
+                if trade_decision is not None and trade_decision.signal != defs.NONE:
+                    self.log_message(f"Place Trade: {trade_decision}", p)
+                    self.log_to_main(f"Place Trade: {trade_decision}")
+                    place_trade(trade_decision, self.api, self.log_message, self.log_to_error, self.trade_risk)
 
     def run(self):
         while True:
-            self.process_candles(self.candle_manager.update_timings())
+            try:
+                self.process_candles(self.candle_manager.update_timings())
+            except Exception as error:
+                self.log_to_error(f"CRASH: {error}")
+                break
+
             time.sleep(Bot.SLEEP)
