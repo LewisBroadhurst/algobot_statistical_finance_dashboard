@@ -1,21 +1,19 @@
 class TradeSettings:
 
-    def __init__(self, object, pair):
-        self.n_ma = object['n_ma']
-        self.n_std = object['n_std']
-        self.maxspread = object['maxspread']
-        self.min_gain = object['min_gain']
-        self.risk_reward = object['risk_reward']
-    
+    def __init__(self, ob, pair):
+        self.n_ma = ob['n_ma']
+        self.n_std = ob['n_std']
+        self.maxspread = ob['maxspread']
+        self.mingain = ob['mingain']
+        self.riskreward = ob['riskreward']
 
     def __repr__(self):
         return str(vars(self))
-    
 
     @classmethod
     def settings_to_str(cls, settings):
-        return_string = "Trade Settings:\n"
+        ret_str = "Trade Settings:\n"
         for _, v in settings.items():
-            return_string += f"{v}\n"
+            ret_str += f"{v}\n"
 
-        return return_string
+        return ret_str

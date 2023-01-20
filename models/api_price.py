@@ -11,8 +11,6 @@ class ApiPrice:
     def __repr__(self):
         return f"ApiPrice() {self.instrument} {self.ask} {self.bid} {self.sell_conv:.6f} {self.buy_conv:.6f}"
 '''
-
-
 class ApiPrice:
 
     def __init__(self, api_ob, homeConversions):

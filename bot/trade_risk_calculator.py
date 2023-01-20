@@ -1,7 +1,6 @@
 from api.oanda_api import OandaApi
-import constants.secrets as constant
+import constants.defs as defs
 from infrastructure.instrument_collection import instrumentCollection as ic
-
 
 def get_trade_units(api: OandaApi, pair, signal, loss, trade_risk, log_message):
 
@@ -16,22 +15,25 @@ def get_trade_units(api: OandaApi, pair, signal, loss, trade_risk, log_message):
         if p.instrument == pair:
             price = p
             break
-
-    if price is None:
+    
+    if price == None:
         log_message("get_trade_units() price is None????", pair)
         return False
-
+        
     log_message(f"get_trade_units() price {price}", pair)
 
     conv = price.buy_conv
-    if signal == constant.SELL:
+    if signal == defs.SELL:
         conv = price.sell_conv
 
-    pip_location = ic.instruments_dict[pair].pipLocation
-    num_pips = loss / pip_location
+    pipLocation = ic.instruments_dict[pair].pipLocation
+    num_pips = loss / pipLocation
     per_pip_loss = trade_risk / num_pips
-    units = per_pip_loss / (conv * pip_location)
+    units = per_pip_loss / (conv * pipLocation)
 
-    log_message(f"{pip_location} {num_pips} {per_pip_loss} {units:.1f}", pair)
+    log_message(f"{pipLocation} {num_pips} {per_pip_loss} {units:.1f}", pair)
 
     return units
+
+    
+

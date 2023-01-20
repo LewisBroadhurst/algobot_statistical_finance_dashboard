@@ -5,22 +5,14 @@ BUY = 1
 SELL = -1
 NONE = 0
 
-
 def apply_take_profit(row, PROFIT_FACTOR):
     if row.SIGNAL != NONE:
         if row.SIGNAL == BUY:
-            if row.direction == BUY:
-                return (row.ask_c - row.ask_o) * PROFIT_FACTOR + row.ask_c
-            else:
-                return (row.ask_o - row.ask_c) * PROFIT_FACTOR + row.ask_o
+            return (row.ask_c - row.ask_o) * PROFIT_FACTOR + row.ask_c
         else:
-            if row.direction == SELL:
-                return (row.bid_c - row.bid_o) * PROFIT_FACTOR + row.ask_c
-            else:
-                return (row.bid_o - row.bid_c) * PROFIT_FACTOR + row.ask_o
+            return (row.bid_c - row.bid_o) * PROFIT_FACTOR + row.bid_c
     else:
         return 0.0
-
 
 def apply_stop_loss(row):
     if row.SIGNAL != NONE:
@@ -31,19 +23,16 @@ def apply_stop_loss(row):
     else:
         return 0.0
 
-
 def remove_spread(df):
     for a in ["ask", "bid"]:
         for b in ["o", "h", "l", "c"]:
             c = f"{a}_{b}"
             df[c] = df[f"mid_{b}"]
 
-
-def apply_signals(df, PROFIT_FACTOR, sig): # sig is a function
+def apply_signals(df, PROFIT_FACTOR, sig):
     df["SIGNAL"] = df.apply(sig, axis=1)
     df["TP"] = df.apply(apply_take_profit, axis=1, PROFIT_FACTOR=PROFIT_FACTOR)
     df["SL"] = df.apply(apply_stop_loss, axis=1)
-
 
 def create_signals(df, time_d=1):
     df_signals = df[df.SIGNAL != NONE].copy() 
@@ -56,6 +45,7 @@ def create_signals(df, time_d=1):
         'm5_start' : 'time'
     }, inplace=True)
     return df_signals
+
 
 
 class Trade:
@@ -98,7 +88,6 @@ class Trade:
             elif row.ask_h >= self.SL:
                 self.close_trade(row, self.loss_factor, row.ask_h)   
 
-
 class GuruTester:
     def __init__(self, df_big,
                     apply_signal, 
@@ -119,7 +108,7 @@ class GuruTester:
         
     def prepare_data(self):
         
-        print("prepare_data...")
+        #print("prepare_data...")
 
         if self.use_spread == False:
             remove_spread( self.df_big)
@@ -139,7 +128,7 @@ class GuruTester:
         self.merged.SIGNAL = self.merged.SIGNAL.astype(int)
 
     def run_test(self):
-        print("run_test...")
+        #print("run_test...")
         open_trades_m5 = []
         closed_trades_m5 = []
 
@@ -155,4 +144,4 @@ class GuruTester:
             open_trades_m5 = [x for x in open_trades_m5 if x.running == True]
 
         self.df_results = pd.DataFrame.from_dict([vars(x) for x in closed_trades_m5]) 
-        print("Result:", self.df_results.result.sum())
+        #print("Result:", self.df_results.result.sum())

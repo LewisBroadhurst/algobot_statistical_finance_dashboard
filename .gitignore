@@ -11,3 +11,6 @@ GBP*
 NZD*
 USD*
 *.log
+.idea
+*.pyc
+.gitignore

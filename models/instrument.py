@@ -1,6 +1,8 @@
 class Instrument:
 
-    def __init__(self, name, ins_type, displayName, pipLocation, tradeUnitsPrecision, marginRate, displayPrecision):
+    def __init__(self, name, ins_type, displayName,
+                    pipLocation, tradeUnitsPrecision, marginRate,
+                    displayPrecision):
         self.name = name
         self.ins_type = ins_type
         self.displayName = displayName
@@ -21,5 +23,5 @@ class Instrument:
             ob['pipLocation'],
             ob['tradeUnitsPrecision'],
             ob['marginRate'],
-            ob['displayPrecision'],
+            ob['displayPrecision']
         )
