@@ -5,6 +5,7 @@ from models.trade_settings import TradeSettings
 from api.oanda_api import OandaApi
 from bot.candle_manager import CandleManager
 from bot.technicals_manager import get_trade_decision
+from constants import secrets as defs
 
 class Bot:
 
@@ -54,6 +55,10 @@ class Bot:
             for p in triggered:
                 last_time = self.candle_manager.timings[p].last_time
                 trade_decision = get_trade_decision(last_time, p, Bot.GRANULARITY, self.api, self.trade_settings[p], self.log_message)
+
+                if trade_decision is not None and trade_decision.signal != defs.NO_TRADE:
+                    self.log_message(f"Place trade: {trade_decision}", p)
+                    self.log_to_main(f"Place trade: {trade_decision}", p)
 
     def run(self):
         while True:
