@@ -192,16 +192,3 @@ class OandaApi:
             return [ApiPrice(x, response['homeConversions']) for x in response['prices']]
 
         return None
-
-
-
-
-
-
-
-
-
-
-
-
-
