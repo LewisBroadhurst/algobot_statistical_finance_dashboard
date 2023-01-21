@@ -4,7 +4,7 @@ import time
 
 from models.candle_timing import CandleTiming
 from bot.trade_risk_calculator import get_trade_units
-import constants.defs as defs
+import constants.secrets as defs
 
 def lm(msg, pair):
     print(msg, pair)

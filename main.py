@@ -1,10 +1,10 @@
 from api.oanda_api import OandaApi
 from infrastructure.instrument_collection import instrumentCollection
-from api.stream_prices import stream_prices
 import constants.secrets as constants
+from stream_example.streamer import run_streamer
 
 if __name__ == '__main__':
     api = OandaApi()    
     instrumentCollection.LoadInstruments("./data")
-    stream_prices(["BTC_USD"])
-    
+    # stream_prices(["BTC_USD"])
+    run_streamer()
