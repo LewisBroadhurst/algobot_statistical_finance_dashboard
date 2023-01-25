@@ -5,3 +5,5 @@ if __name__ == "__main__":
     instrumentCollection.LoadInstruments("./data")
     b = Bot()
     b.run()
+
+    #hi
