@@ -49,6 +49,17 @@ class CandlePlot:
             font=dict(size=8, color="#e1e1e1")
         )
     
-    def show_plot(self, width=900, height=600, nticks=5):
+    def add_ema_traces(self, ema_list: list):
+        for ema in ema_list:
+            self.df_plot[f'ema_{ema}'] = self.df_plot.mid_c.ewm(span=ema, min_periods=ema).mean()
+            
+            self.fig.add_trace(go.Line(
+                x=self.df_plot.sTime,
+                y=self.df_plot[f"ema_{ema}"],
+                mode='lines',
+                name='lines'
+            ))
+
+    def show_plot(self, width=1600, height=900, nticks=5):
         self.update_layout(width, height, nticks)
         self.fig.show()
