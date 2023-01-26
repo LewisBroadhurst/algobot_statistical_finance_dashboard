@@ -16,7 +16,7 @@ class LinePlot:
     
     def create_line_plot(self):
         self.add_timestr()
-        self.fig.add_trace(go.scatter.Line(
+        self.fig.add_trace(go.Line(
             x=self.df_plot.sTime,
             y=self.df_plot.mid_c,
             mode='lines',
