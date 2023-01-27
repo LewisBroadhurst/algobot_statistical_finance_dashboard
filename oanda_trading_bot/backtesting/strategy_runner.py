@@ -65,3 +65,20 @@ class StrategyRunner:
         self.merged = pd.merge(left=df_m5_slim, right=df_signals, on='time', how='left')
         self.merged.fillna(0, inplace=True)
         self.merged.SIGNAL = self.merged.SIGNAL.astype(int)
+    
+    def run_test(self):
+        open_trades = []
+        closed_trades = []
+
+        for _, row in self.df.iterrows():
+            if row.trade != NONE:
+                open_trades.append(Trade(row, ___, ___))
+        
+            for ot in open_trades:
+                ot.update(row)
+                if ot.running == False:
+                    closed_trades.append(ot)
+            open_trades_m5 = [x for x in open_trades_m5 if x.running == True]
+
+        self.df_results = pd.DataFrame.from_dict([vars(x) for x in closed_trades]) 
+        print("Result:", self.df_results.result.sum())
