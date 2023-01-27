@@ -1,6 +1,6 @@
 import pandas as pd
 from dateutil import parser
-from technicals.indicators import MACD
+from charting.indicators import MACD
 from simulation.guru_tester import GuruTester
 from infrastructure.instrument_collection import InstrumentCollection
 
