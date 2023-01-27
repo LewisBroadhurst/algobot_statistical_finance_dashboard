@@ -15,6 +15,7 @@ def ATR(df: pd.DataFrame, n=14):
     tr3 = abs(prev_c - df.mid_l)
     tr = pd.DataFrame({'tr1': tr1, 'tr2': tr2, 'tr3': tr3}).max(axis=1)
     df[f"ATR_{n}"] = tr.rolling(window=n).mean()
+    
     return df
 
 def KeltnerChannels(df: pd.DataFrame, n_ema=20, n_atr=10):

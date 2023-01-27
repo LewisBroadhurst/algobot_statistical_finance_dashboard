@@ -20,8 +20,30 @@ class LinePlot:
             x=self.df_plot.sTime,
             y=self.df_plot.mid_c,
             mode='lines',
-            name='lines'
+            name='price'
         ))
+    
+    def create_rsi(self, df: pd.DataFrame, n=14):
+        alpha = 1.0 / n
+        gains = self.df_plot.mid_c.diff()
+
+        wins = pd.Series([ x if x >= 0 else 0.0 for x in gains ], name="wins")
+        losses = pd.Series([ x * -1 if x < 0 else 0.0 for x in gains ], name="losses")
+
+        wins_rma = wins.ewm(min_periods=n, alpha=alpha).mean()
+        losses_rma = losses.ewm(min_periods=n, alpha=alpha).mean()
+
+        rs = wins_rma / losses_rma
+        df[f"RSI_{n}"] = 100.0 - (100.0 / (1.0 + rs))
+
+        self.add_timestr()
+        self.fig.add_trace(go.Line(
+            x=self.df_plot.sTime,
+            y=self.df_plot[f"RSI_{n}"],
+            mode='lines',
+            name=f"RSI_{n}"
+        ))
+        
 
     def add_ema_traces(self, ema_list: list):
         for ema in ema_list:

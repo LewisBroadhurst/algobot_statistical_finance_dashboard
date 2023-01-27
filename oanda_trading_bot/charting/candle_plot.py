@@ -1,5 +1,6 @@
 import datetime as dt
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import pandas as pd
 
 
@@ -16,6 +17,7 @@ class CandlePlot:
     
     def create_candle_fig(self):
         self.add_timestr()
+        self.fig = make_subplots(specs=[[{"secondary_y": True}]])
         self.fig.add_trace(go.Candlestick(
             x=self.df_plot.sTime,
             open=self.df_plot.mid_o,
@@ -57,8 +59,18 @@ class CandlePlot:
                 x=self.df_plot.sTime,
                 y=self.df_plot[f"ema_{ema}"],
                 mode='lines',
-                name='lines'
+                name=f'{ema} EMA'
             ))
+    
+    def add_indicator_traces(self, line_traces: list):
+        for t in line_traces:
+            self.fig.add_trace(go.Scatter(
+                x=self.df_plot.sTime,
+                y=self.df_plot[t],
+                line=dict(width=2),
+                line_shape="spline",
+                name=t
+            ), secondary_y=False)
 
     def show_plot(self, width=1600, height=900, nticks=5):
         self.update_layout(width, height, nticks)
