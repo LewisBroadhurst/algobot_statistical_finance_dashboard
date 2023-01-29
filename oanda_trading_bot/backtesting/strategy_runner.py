@@ -32,5 +32,16 @@ class StrategyRunner:
                 ot.tp_sl_check(row)
                 if ot.open == False:
                     closed_trades.append(ot)
+        
+        df_left = self.df[['time', 'bid_h', 'bid_l', 'ask_h', 'ask_l']].copy()
+        self.df_results = pd.DataFrame.from_dict([vars(x) for x in closed_trades]) 
+        self.merged = pd.merge(left=df_left, right=self.df_results, on='time', how='left')
 
-        return open_trades
+        output = dict(
+            df_results = self.df_results,
+            df_merged = self.merged,
+            closed_trades = closed_trades,
+            open_trades = open_trades
+        )
+
+        return output
