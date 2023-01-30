@@ -2,8 +2,7 @@
 
 class Trade:
     def __init__(self, row, tp_func, sl_func):
-        self.entry_time = row.time
-        self.close_time = row.time
+        self.time = row.time
         self.open = True
 
         if row.trade == 1:

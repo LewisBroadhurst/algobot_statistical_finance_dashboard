@@ -13,20 +13,15 @@ class BbAsrV1:
 
         self.df["sTime"] = [dt.datetime.strftime(x, "s%y-%m-%d %H:%M") for x in self.df.time]
         self.df["trade"] = self.df.apply(trade_confirmation_func, axis=1)
-        self.df = self.df[self.df.trade != 0].copy()
         self.df["tp"] = self.df.apply(tp_func, axis=1)
         self.df["sl"] = self.df.apply(sl_func, axis=1)
-
-        self.df_trades = self.df.copy()
-        self.df_trades = self.df_trades[self.df_trades.trade != 0].copy()
-        self.df_trades.reset_index(drop=True, inplace=True)
-    
+        self.df_slim = self.df[['time', 'mid_c', 'bid_c', 'ask_c', 'BB_MA', 'BB_UP', 'BB_LW', 'sTime', 'trade', 'tp', 'sl']].copy()
 
     def run_simulation(self):
         open_trades = []
         closed_trades = []
 
-        for _, row in self.df_trades.iterrows():
+        for _, row in self.df_slim.iterrows():
             if row.trade != 0:
                 open_trades.append(Trade(row, self.tp_func, self.sl_func))
         
@@ -36,7 +31,15 @@ class BbAsrV1:
                 if ot.open == False:
                     closed_trades.append(ot)
         
-        self.df_results = pd.DataFrame.from_dict([vars(x) for x in closed_trades])
-        self.df_results = pd.merge(left=self.df_results, right=self.df_trades, on=['tp', 'sl', 'trade'])
-        return [open_trades, closed_trades]
+        try: 
+            self.df_results = pd.DataFrame.from_dict([vars(x) for x in closed_trades])
+            self.df_merge = pd.merge(left=self.df_results, right=self.df_slim, on=['time', 'tp', 'sl', 'trade'])
+            self.df_merge = self.df_merge.drop_duplicates()
+            self.taken_trades = [open_trades, closed_trades]
+        
+        except: 
+            print("Check your entry function. Does the dataset produce any valid trades?")
+        
+        
+        
         
