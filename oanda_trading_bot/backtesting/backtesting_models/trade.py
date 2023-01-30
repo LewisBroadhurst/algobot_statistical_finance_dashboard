@@ -7,9 +7,9 @@ class Trade:
         self.open = True
 
         if row.trade == 1:
-            self.entry_price = row.ask_c
+            self.entry_price = row.mid_c
         if row.trade == -1:
-            self.entry_price = row.bid_c
+            self.entry_price = row.mid_c
 
         self.tp = tp_func(row)
         self.sl = sl_func(row)
@@ -19,17 +19,17 @@ class Trade:
         
     def tp_sl_check(self, row):
         if self.trade == 1:
-            if row.bid_c >= self.tp:
+            if row.mid_c >= self.tp:
                 self.close_trade(row, "W")
             
-            if row.ask_c <= self.sl:
+            if row.mid_c <= self.sl:
                 self.close_trade(row, "L")
 
         if self.trade == -1:
-            if row.ask_c <= self.tp:
+            if row.mid_c <= self.tp:
                 self.close_trade(row, "W")
             
-            if row.bid_c >= self.sl:
+            if row.mid_c >= self.sl:
                 self.close_trade(row, "L")
 
 

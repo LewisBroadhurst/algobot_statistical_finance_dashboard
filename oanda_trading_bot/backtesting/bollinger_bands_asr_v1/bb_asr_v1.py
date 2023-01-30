@@ -2,24 +2,6 @@ import pandas as pd
 import datetime as dt
 from backtesting.backtesting_models.trade import Trade
 
-def trade_confirmation_func(row):
-    if row.ask_c < row.BB_LW:
-        return 1
-    if row.bid_c > row.BB_UP:
-        return -1
-    return 0
-    
-def tp_func(row):
-    if row.trade == 1:
-        return row.ask_c * 1.005
-    if row.trade == -1:
-        return row.bid_c * 1.005
-
-def sl_func(row):
-    if row.trade == 1:
-        return row.ask_c * 0.995
-    if row.trade == -1:
-        return row.bid_c * 0.995
 
 class BbAsrV1:
 
@@ -55,5 +37,6 @@ class BbAsrV1:
                     closed_trades.append(ot)
         
         self.df_results = pd.DataFrame.from_dict([vars(x) for x in closed_trades])
+        self.df_results = pd.merge(left=self.df_results, right=self.df_trades, on=['tp', 'sl', 'trade'])
         return [open_trades, closed_trades]
         
