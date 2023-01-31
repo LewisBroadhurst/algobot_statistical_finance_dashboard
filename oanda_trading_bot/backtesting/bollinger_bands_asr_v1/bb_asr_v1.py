@@ -37,7 +37,7 @@ class BbAsrV1:
             self.df_merge = self.df_merge.drop_duplicates()
             self.taken_trades = [open_trades, closed_trades]
         
-        except: 
+        except Exception:
             print("Check your entry function. Does the dataset produce any valid trades?")
         
         
