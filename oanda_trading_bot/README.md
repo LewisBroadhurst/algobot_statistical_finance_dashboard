@@ -7,6 +7,7 @@
 
 
 ### 30/01/23
-- [ ] work through each step of the strategy runner in detail
-- [ ] Find any bugs, understand bugs, improve code
-- [ ] Produce an effective simulation
+- [x] work through each step of the strategy runner in detail
+- [x] Find any bugs, understand bugs, improve code
+- [x] Produce an effective simulation
+- [ ] Create xlsx from simulation
