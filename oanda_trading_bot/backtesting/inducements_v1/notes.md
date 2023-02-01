@@ -11,8 +11,8 @@
 - ITERROWS ITERROWS ITERROWS
 
 ## Plan...
-- [ ] Look at last 7 days of PA
-- [ ] Generate the daily lows/highs
+- [x] Look at last 7 days of PA
+- [x] Generate the daily lows/highs
 - [ ] Method that will remove lows/highs that are taken outside of trading window or taken in trading window
 - [ ] Enter 'trading mode' within 7:30-4:30 daily
 - [ ] If low/high taken, buy/sell of full vol candle
