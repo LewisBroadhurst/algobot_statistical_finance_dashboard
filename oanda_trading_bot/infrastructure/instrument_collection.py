@@ -36,4 +36,5 @@ class InstrumentCollection:
         [print(k,v) for k,v in self.instruments_dict.items()]
         print(len(self.instruments_dict.keys()), "instruments")
 
+
 instrumentCollection = InstrumentCollection()

@@ -1,6 +1,10 @@
 from api.oanda_api import OandaApi
 from infrastructure.collect_data import run_collection
-from infrastructure.instrument_collection import instrumentCollection as ic
+import json
+
 
 api = OandaApi()
-run_collection(ic, api)
+f = open("data/instruments.json")
+data = json.load(f)
+run_collection(data, api)
+f.close()

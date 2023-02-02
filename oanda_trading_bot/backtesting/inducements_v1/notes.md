@@ -17,3 +17,5 @@
 - [ ] Enter 'trading mode' within 7:30-4:30 daily
 - [ ] If low/high taken, buy/sell of full vol candle
 - [ ] TP at xyz / SL at abc
+
+- Try starting from back to front???

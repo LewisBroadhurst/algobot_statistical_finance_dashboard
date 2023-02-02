@@ -21,16 +21,16 @@ def save_file(final_df: pd.DataFrame, file_prefix, granularity, pair):
     final_df.drop_duplicates(subset=['time'], inplace=True)
     final_df.sort_values(by='time', inplace=True)
     final_df.reset_index(drop=True, inplace=True)
-    final_df.to_pickle(filename);
+    final_df.to_pickle(filename)
 
     s1 = f"*** {pair} {granularity} {final_df.time.min()} {final_df.time.max()}"
     print(f"*** {s1} --> {final_df.shape[0]} candles ***")
 
 
-def fetch_candles(pair, granularity, date_f: dt.datetime, 
-                    date_t: dt.datetime, api: OandaApi ):
+def fetch_candles(pair, granularity, date_f: dt.datetime, date_t: dt.datetime, api: OandaApi):
 
     attempts = 0
+    candles_df = None
 
     while attempts < 3:
 
@@ -54,7 +54,7 @@ def fetch_candles(pair, granularity, date_f: dt.datetime,
 
 def collect_data(pair, granularity, date_f, date_t, file_prefix, api: OandaApi ):
     
-    time_step = INCREMENTS[granularity]
+    # time_step = INCREMENTS[granularity]
 
     end_date = parser.parse(date_t)
     from_date = parser.parse(date_f)
@@ -64,7 +64,7 @@ def collect_data(pair, granularity, date_f, date_t, file_prefix, api: OandaApi )
     to_date = from_date
 
     while to_date < end_date:
-        to_date = from_date + dt.timedelta(minutes=time_step)
+        to_date = from_date + dt.timedelta(minutes=1440)
         if to_date > end_date:
             to_date = end_date
 
@@ -93,15 +93,14 @@ def collect_data(pair, granularity, date_f, date_t, file_prefix, api: OandaApi )
 
 
 def run_collection(ic: InstrumentCollection, api: OandaApi):
-    for pair in LMBROADHURST_PAIRS:
-        if pair in ic.instruments_dict.keys():
-            for granularity in ["D"]:
-                print(pair, granularity)
-                collect_data(
-                    pair,
-                    granularity,
-                    "2010-01-01T00:00:00Z",
-                    "2023-01-01T00:00:00Z",
-                    "./data/",
-                    api
-                )
+    for pair in ["EUR_USD"]:
+        for granularity in ["D"]:
+            print(pair, granularity)
+            collect_data(
+                pair,
+                granularity,
+                "2010-01-01T00:00:00Z",
+                "2023-01-01T00:00:00Z",
+                "./data/",
+                api
+            )
