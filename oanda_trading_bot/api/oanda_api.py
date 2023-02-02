@@ -1,4 +1,4 @@
-import requests
+
 import pandas as pd
 import json
 import constants.secrets as defs

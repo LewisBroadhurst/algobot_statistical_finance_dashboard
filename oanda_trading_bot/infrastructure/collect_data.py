@@ -4,6 +4,7 @@ from dateutil import parser
 
 from infrastructure.instrument_collection import InstrumentCollection
 from api.oanda_api import OandaApi
+from constants.secrets import LMBROADHURST_PAIRS
 
 CANDLE_COUNT = 3000
 
@@ -92,18 +93,15 @@ def collect_data(pair, granularity, date_f, date_t, file_prefix, api: OandaApi )
 
 
 def run_collection(ic: InstrumentCollection, api: OandaApi):
-    our_curr = ["AUD", "CAD", "JPY", "USD", "EUR", "GBP", "NZD"]
-    for p1 in our_curr:
-        for p2 in our_curr:
-            pair = f"{p1}_{p2}"
-            if pair in ic.instruments_dict.keys():
-                for granularity in ["M5", "H1", "H4"]:
-                    print(pair, granularity)
-                    collect_data(
-                        pair,
-                        granularity,
-                        "2016-01-07T00:00:00Z",
-                        "2021-12-31T00:00:00Z",
-                        "./data/",
-                        api
-                    )
+    for pair in LMBROADHURST_PAIRS:
+        if pair in ic.instruments_dict.keys():
+            for granularity in ["D"]:
+                print(pair, granularity)
+                collect_data(
+                    pair,
+                    granularity,
+                    "2010-01-01T00:00:00Z",
+                    "2023-01-01T00:00:00Z",
+                    "./data/",
+                    api
+                )
