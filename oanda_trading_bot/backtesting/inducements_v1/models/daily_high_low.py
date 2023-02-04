@@ -1,9 +1,9 @@
 class DailyHighLow:
 
-    def __init__(self, time, price):
+    def __init__(self, date, price):
         self.taken = False
         self.expired = False
-        self.time = time
+        self.date = date
         self.price = price
 
     def high_taken(self):

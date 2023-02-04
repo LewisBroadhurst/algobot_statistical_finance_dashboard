@@ -16,7 +16,11 @@ TWEEZER_HL = 0.01
 TWEEZER_TOP_BODY = 40.0
 TWEEZER_BOTTOM_BODY = 60.0
 
-apply_marubozu = lambda x: x.body_perc > MARUBOZU
+def apply_marubozu(row):
+    if row.body_perc > MARUBOZU:
+        return True
+
+    return False
 
 def apply_hanging_man(row):
     if row.body_bottom_perc > HANGING_MAN_HEIGHT:
