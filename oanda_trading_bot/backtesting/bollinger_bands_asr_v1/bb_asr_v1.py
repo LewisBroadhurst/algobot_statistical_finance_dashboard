@@ -15,7 +15,8 @@ class BbAsrV1:
         self.df["trade"] = self.df.apply(trade_confirmation_func, axis=1)
         self.df["tp"] = self.df.apply(tp_func, axis=1)
         self.df["sl"] = self.df.apply(sl_func, axis=1)
-        self.df_slim = self.df[['time', 'mid_c', 'bid_c', 'ask_c', 'BB_MA', 'BB_UP', 'BB_LW', 'sTime', 'trade', 'tp', 'sl']].copy()
+        self.df_slim = self.df[['time', 'mid_c', 'bid_c', 'ask_c', 'BB_MA', 'BB_UP', 'BB_LW', 'sTime', 'trade', 'tp',
+                                'sl']].copy()
 
     def run_simulation(self):
         open_trades = []

@@ -20,8 +20,8 @@ class InducementSimulatorV1:
     def __init__(self, entry_df: pd.DataFrame):
         self.df = entry_df.copy()
         self.df = apply_candle_props(self.df)
-        self.df = BollingerBands(self.df)
-        self.df = RSI(self.df, 10)
+        # self.df = BollingerBands(self.df)
+        # self.df = RSI(self.df, 10)
         self.df = ATR(self.df, 7)
         self.df["sTime"] = [dt.datetime.strftime(x, "s%y-%m-%d %H:%M") for x in self.df.time]
         self.df["OB"] = self.df.apply(apply_marubozu, axis=1)
@@ -84,6 +84,7 @@ class InducementSimulatorV1:
 
     def run_simulation(self):
         # TODO: move to BE or close after e.g. 1Hr open
+        # TODO: close trades after opening
         open_trades = []
         closed_trades = []
 
@@ -94,22 +95,16 @@ class InducementSimulatorV1:
             if self.trades_today > 2:
                 open_trades.append(Trade(0, None, None, None, row.time))
 
-            elif (row.mid_h - 0.00100) > self.pdh != 0 and row.direction == -1 and row.OB is True and 8 < row.time.hour < 18:
+            elif (row.mid_h - 0.00100) > self.pdh != 0 \
+                    and row.direction == -1 \
+                    and row.OB is True \
+                    and 8 < row.time.hour < 12:
                 time = row.time
                 sl = row.mid_c + 0.0020
                 tp = row.mid_c - 0.0060
                 entry_price = row.mid_c
 
                 open_trades.append(Trade(1, entry_price, tp, sl, time))
-                self.trades_today += 1
-
-            elif (row.mid_l + 0.00100) < self.pdl != 0 and row.direction == 1 and row.OB is True and 8 < row.time.hour < 18:
-                time = row.time
-                sl = row.mid_c - 0.0020
-                tp = row.mid_c + 0.0060
-                entry_price = row.mid_c
-
-                open_trades.append(Trade(-1, entry_price, tp, sl, time))
                 self.trades_today += 1
 
             else:
