@@ -29,6 +29,7 @@ class InducementSimulatorV1:
         self.pdl = 0
         self.tp = 0
         self.sl = 0
+        self.trades_today = 0
 
         self.cp = CandlePlot(self.df)
         self.cp.add_ema_traces([5, 20])
@@ -51,25 +52,38 @@ class InducementSimulatorV1:
 
                 self.pdh = hod
 
+
+    def max_trade_check(self, row):
+        if row.time.hour == 22 and row.time.minute == 0:
+            self.trades_today = 0
+
     def run_simulation(self):
         open_trades = []
         closed_trades = []
 
         for _, row in self.df.iterrows():
             self.refresh_hod(row, self.df)
+            self.max_trade_check(row)
 
-            if row.mid_h > self.pdh != 0 and row.direction == -1 and row.OB is True:
-                time = row.time
-                sl = row.mid_c + 0.0020
-                tp = row.mid_c - 0.0060
-                entry_price = row.mid_c
+            if 8 < row.time.hour < 18:
 
-                open_trades.append(Trade(1, entry_price, tp, sl, time))
+                if self.trades_today > 2:
+                    open_trades.append(Trade(0, None, None, None, row.time))
 
-            else:
-                open_trades.append(Trade(0, None, None, None, row.time))
+                elif row.mid_h > self.pdh != 0 and row.direction == -1 and row.OB is True:
+                    time = row.time
+                    sl = row.mid_c + 0.0020
+                    tp = row.mid_c - 0.0060
+                    entry_price = row.mid_c
 
-        df_trades = pd.DataFrame([{'trade': s.trade, 'entry': s.entry_price, 'tp': s.tp, 'sl': s.sl, 'time': s.time} for s in open_trades])
+                    open_trades.append(Trade(1, entry_price, tp, sl, time))
+                    self.trades_today += 1
+
+                else:
+                    open_trades.append(Trade(0, None, None, None, row.time))
+
+        df_trades = pd.DataFrame([{'trade': s.trade, 'entry': s.entry_price, 'tp': s.tp, 'sl': s.sl, 'time': s.time}
+                                  for s in open_trades])
         self.df_merge = pd.merge(left=self.df, right=df_trades, on=['time'])
 
         return self.df_merge
