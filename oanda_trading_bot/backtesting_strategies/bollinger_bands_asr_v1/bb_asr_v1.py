@@ -1,6 +1,6 @@
 import pandas as pd
 import datetime as dt
-from backtesting.backtesting_models.trade import Trade
+from backtesting_strategies.backtesting_models.trade import Trade
 
 
 class BbAsrV1:

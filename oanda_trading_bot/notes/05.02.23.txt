@@ -1,9 +1,0 @@
-Realistic thoughts:
-
-- There's no way that a super simple ema/rsi etc strategy would work. It would be everywhere.
--> Naturally this means I need to find something unique or significantly more complex.
-
-What do I think are actually good ways of following a trend or catching a reversal?
-- trading towards liquidity
-- trading away from liquidity swipes
-- EMA/LIT/RSI as

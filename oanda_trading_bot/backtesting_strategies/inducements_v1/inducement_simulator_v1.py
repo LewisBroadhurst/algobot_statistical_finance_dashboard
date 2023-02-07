@@ -39,10 +39,15 @@ class InducementSimulatorV1:
 
     def refresh_hod_lod(self, row, df):
         if row.time.hour == 22 and row.time.minute == 0:
-            if row.name - 288 < 0:
+            if (row.name - (288 * 2)) < 0:
                 self.pdh = 0
 
             else:
+                if self.pdh != 0 != self.pdl:
+                    return
+                else:
+                    pass
+
                 start_of_pd = row.name - 288
                 end_of_pd = row.name
 
@@ -54,6 +59,8 @@ class InducementSimulatorV1:
 
                 self.pdh = hod
                 self.pdl = lod
+
+
 
 
     def max_trade_check(self, row):

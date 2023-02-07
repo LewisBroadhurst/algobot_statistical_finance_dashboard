@@ -4,19 +4,27 @@ from plotly.subplots import make_subplots
 import pandas as pd
 
 
-class CandlePlot:
+class PriceTimeChart:
 
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, chart_type: str):
         self.df_plot = df.copy()
         self.fig = go.Figure()
-        self.create_candle_fig()
+        self.chart_type = chart_type
 
-    def add_timestr(self):
+        self.add_timestring()
+
+        if chart_type is "candle":
+            self.create_candle_fig()
+        if chart_type is "line":
+            self.create_line_fig()
+
+
+    def add_timestring(self):
         """Hack for removing weekend candles"""
         self.df_plot['sTime'] = [dt.datetime.strftime(x, "s%y-%m-%d %H:%M") for x in self.df_plot.time]
-    
+
+
     def create_candle_fig(self):
-        self.add_timestr()
         self.fig = make_subplots(specs=[[{"secondary_y": True}]])
         self.fig.add_trace(go.Candlestick(
             x=self.df_plot.sTime,
@@ -27,15 +35,37 @@ class CandlePlot:
             line=dict(width=1), opacity=1,
             increasing_fillcolor='#24A06B',
             decreasing_fillcolor="#CC2E3C",
-            increasing_line_color='#2EC886',  
+            increasing_line_color='#2EC886',
             decreasing_line_color='#FF3A4C'
         ))
 
-    def update_layout(self, width, height, nticks):
+
+    def create_line_fig(self, df_property):
+        self.fig.add_trace(go.Line(
+            x=self.df_plot.sTime,
+            y=self.df_plot[df_property],
+            mode='lines',
+            name='price'
+        ))
+
+
+    def add_line_based_indicators(self, indicators: list):
+        for indicator in indicators:
+            self.fig.add_trace(go.Line(
+                x=self.df_plot.sTime,
+                y=self.df_plot[f"{indicator}"],
+                mode='lines',
+                name=f'{indicator}'
+            ))
+
+
+    # Show and Customise plot #
+
+
+    def update_layout(self, width, height, ticks):
         self.fig.update_xaxes(
             gridcolor="#1f292f",
-            nticks=nticks,
-            rangeslider=dict(visible=False)
+            nticks=ticks,
         )
 
         self.fig.update_yaxes(
@@ -47,31 +77,11 @@ class CandlePlot:
             height=height,
             paper_bgcolor="#2c303c",
             plot_bgcolor="#2c303c",
-            margin=dict(l=10,r=10,b=10,t=10),
+            margin=dict(l=10, r=10, b=10, t=10),
             font=dict(size=8, color="#e1e1e1")
         )
-    
-    def add_ema_traces(self, ema_list: list):
-        for ema in ema_list:
-            self.df_plot[f'ema_{ema}'] = self.df_plot.mid_c.ewm(span=ema, min_periods=ema).mean()
-            
-            self.fig.add_trace(go.Line(
-                x=self.df_plot.sTime,
-                y=self.df_plot[f"ema_{ema}"],
-                mode='lines',
-                name=f'{ema} EMA'
-            ))
-    
-    def add_indicator_traces(self, line_traces: list):
-        for t in line_traces:
-            self.fig.add_trace(go.Scatter(
-                x=self.df_plot.sTime,
-                y=self.df_plot[t],
-                line=dict(width=2),
-                line_shape="spline",
-                name=t
-            ), secondary_y=False)
 
-    def show_plot(self, width=1600, height=900, nticks=5):
-        self.update_layout(width, height, nticks)
+
+    def show_plot(self, width=1600, height=900, ticks=5):
+        self.update_layout(width, height, ticks)
         self.fig.show()

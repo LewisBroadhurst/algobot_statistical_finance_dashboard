@@ -1,13 +1,15 @@
 import pandas as pd
 
+
 def BollingerBands(df: pd.DataFrame, n: int = 20, s: int = 2):
-    typical_p = ( df.mid_c + df.mid_h + df.mid_l ) / 3
+    typical_p = (df.mid_c + df.mid_h + df.mid_l) / 3
     stddev = typical_p.rolling(window=n).std()
     df['BB_MA'] = typical_p.rolling(window=n).mean()
     df['BB_UP'] = df['BB_MA'] + stddev * s
     df['BB_LW'] = df['BB_MA'] - stddev * s
 
     return df
+
 
 def ATR(df: pd.DataFrame, n=14):
     prev_c = df.mid_c.shift(1)
@@ -19,20 +21,21 @@ def ATR(df: pd.DataFrame, n=14):
     
     return df
 
+
 def RSI(df: pd.DataFrame, n: int):
     alpha = 1.0 / n
     gains = df.mid_c.diff()
 
-    wins = pd.Series([ x if x >= 0 else 0.0 for x in gains ], name="wins")
-    losses = pd.Series([ x * -1 if x < 0 else 0.0 for x in gains ], name="losses")
+    wins = pd.Series([x if x >= 0 else 0.0 for x in gains], name="wins")
+    losses = pd.Series([x * -1 if x < 0 else 0.0 for x in gains], name="losses")
 
     wins_rma = wins.ewm(min_periods=n, alpha=alpha).mean()
     losses_rma = losses.ewm(min_periods=n, alpha=alpha).mean()
-
     rs = wins_rma / losses_rma
-
     df[f"RSI_{n}"] = 100.0 - (100.0 / (1.0 + rs))
+
     return df
+
 
 def MACD(df: pd.DataFrame, n_slow=26, n_fast=12, n_signal=9):
 
@@ -45,6 +48,7 @@ def MACD(df: pd.DataFrame, n_slow=26, n_fast=12, n_signal=9):
 
     return df
 
+
 def KeltnerChannels(df: pd.DataFrame, n_ema=20, n_atr=10):
     df['EMA'] = df.mid_c.ewm(span=n_ema, min_periods=n_ema).mean()
     df = ATR(df, n=n_atr)
@@ -53,3 +57,7 @@ def KeltnerChannels(df: pd.DataFrame, n_ema=20, n_atr=10):
     df['KeLo'] = df.EMA - df[c_atr] * 2
     df.drop(c_atr, axis=1, inplace=True)
     return df
+
+
+def EMA(df: pd.DataFrame, n):
+    df['EMA'] = df.mid_c.ewm(span=n, min_periods=n).mean()
