@@ -1,5 +1,6 @@
 import datetime as dt
 import plotly.graph_objects as go
+import plotly.graph_objects
 from plotly.subplots import make_subplots
 import pandas as pd
 
@@ -13,9 +14,9 @@ class PriceTimeChart:
 
         self.add_timestring()
 
-        if chart_type is "candle":
+        if chart_type == "candle":
             self.create_candle_fig()
-        if chart_type is "line":
+        if chart_type == "line":
             self.create_line_fig()
 
 
@@ -40,10 +41,10 @@ class PriceTimeChart:
         ))
 
 
-    def create_line_fig(self, df_property):
-        self.fig.add_trace(go.Line(
+    def create_line_fig(self):
+        self.fig.add_trace(go.Scatter(
             x=self.df_plot.sTime,
-            y=self.df_plot[df_property],
+            y=self.df_plot.mid_c,
             mode='lines',
             name='price'
         ))
@@ -51,7 +52,7 @@ class PriceTimeChart:
 
     def add_line_based_indicators(self, indicators: list):
         for indicator in indicators:
-            self.fig.add_trace(go.Line(
+            self.fig.add_trace(go.Scatter(
                 x=self.df_plot.sTime,
                 y=self.df_plot[f"{indicator}"],
                 mode='lines',

@@ -50,7 +50,7 @@ def MACD(df: pd.DataFrame, n_slow=26, n_fast=12, n_signal=9):
 
 
 def KeltnerChannels(df: pd.DataFrame, n_ema=20, n_atr=10):
-    df['EMA'] = df.mid_c.ewm(span=n_ema, min_periods=n_ema).mean()
+    df[f'EMA_{n_ema}'] = df.mid_c.ewm(span=n_ema, min_periods=n_ema).mean()
     df = ATR(df, n=n_atr)
     c_atr = f"ATR_{n_atr}"
     df['KeUp'] = df[c_atr] * 2 + df.EMA
@@ -59,5 +59,7 @@ def KeltnerChannels(df: pd.DataFrame, n_ema=20, n_atr=10):
     return df
 
 
-def EMA(df: pd.DataFrame, n):
-    df['EMA'] = df.mid_c.ewm(span=n, min_periods=n).mean()
+def EMA(df: pd.DataFrame, n_list: list):
+    for n in n_list:
+        df[f'EMA_{n}'] = df.mid_c.ewm(span=n, min_periods=n).mean()
+        return df
