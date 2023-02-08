@@ -1,22 +1,17 @@
 import datetime as dt
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import pandas as pd
 
 
-class PriceTimeChart:
+class PriceIndependentIndicator:
 
-    def __init__(self, df: pd.DataFrame, chart_type: str):
+    def __init__(self, df: pd.DataFrame, base_indicator: str):
         self.df_plot = df.copy()
         self.fig = go.Figure()
-        self.chart_type = chart_type
+        self.base_indicator = base_indicator
 
         self.add_timestring()
-
-        if chart_type == "candle":
-            self.create_candle_fig()
-        if chart_type == "line":
-            self.create_line_fig()
+        self.create_line_fig(base_indicator)
 
 
     def add_timestring(self):
@@ -24,37 +19,29 @@ class PriceTimeChart:
         self.df_plot['sTime'] = [dt.datetime.strftime(x, "s%y-%m-%d %H:%M") for x in self.df_plot.time]
 
 
-    def create_candle_fig(self):
-        self.fig = make_subplots(specs=[[{"secondary_y": True}]])
-        self.fig.add_trace(go.Candlestick(
-            x=self.df_plot.sTime,
-            open=self.df_plot.mid_o,
-            high=self.df_plot.mid_h,
-            low=self.df_plot.mid_l,
-            close=self.df_plot.mid_c,
-            line=dict(width=1), opacity=1,
-            increasing_fillcolor='#24A06B',
-            decreasing_fillcolor="#CC2E3C",
-            increasing_line_color='#2EC886',
-            decreasing_line_color='#FF3A4C'
-        ))
-
-
-    def create_line_fig(self):
+    def create_line_fig(self, base_indicator):
         self.fig.add_trace(go.Scatter(
             x=self.df_plot.sTime,
-            y=self.df_plot.mid_c,
+            y=self.df_plot[f'{base_indicator}'],
             mode='lines',
-            name='price'
+            name=f'{base_indicator}'
         ))
 
 
-    def add_line_based_indicators(self, indicators: list):
+    def add_secondary_line_based_indicators(self, indicators: list):
         for indicator in indicators:
             self.fig.add_trace(go.Scatter(
                 x=self.df_plot.sTime,
                 y=self.df_plot[f"{indicator}"],
                 mode='lines',
+                name=f'{indicator}'
+            ))
+
+    def add_bar_based_indicators(self, indicators: list):
+        for indicator in indicators:
+            self.fig.add_trace(go.Bar(
+                x=self.df_plot.sTime,
+                y=self.df_plot[f"{indicator}"],
                 name=f'{indicator}'
             ))
 
@@ -66,7 +53,6 @@ class PriceTimeChart:
         self.fig.update_xaxes(
             gridcolor="#1f292f",
             nticks=ticks,
-            rangeslider=dict(visible=False)
         )
 
         self.fig.update_yaxes(
@@ -81,7 +67,6 @@ class PriceTimeChart:
             margin=dict(l=10, r=10, b=10, t=10),
             font=dict(size=8, color="#e1e1e1")
         )
-
 
     def show_plot(self, width=1600, height=900, ticks=5):
         self.update_layout(width, height, ticks)

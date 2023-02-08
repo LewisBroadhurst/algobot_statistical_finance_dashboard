@@ -22,19 +22,26 @@ def ATR(df: pd.DataFrame, n=14):
     return df
 
 
-def RSI(df: pd.DataFrame, n: int):
-    alpha = 1.0 / n
+def RSI(df: pd.DataFrame, rsi_n: int, ema_n: int):
+    alpha = 1.0 / rsi_n
     gains = df.mid_c.diff()
 
     wins = pd.Series([x if x >= 0 else 0.0 for x in gains], name="wins")
     losses = pd.Series([x * -1 if x < 0 else 0.0 for x in gains], name="losses")
 
-    wins_rma = wins.ewm(min_periods=n, alpha=alpha).mean()
-    losses_rma = losses.ewm(min_periods=n, alpha=alpha).mean()
+    wins_rma = wins.ewm(min_periods=rsi_n, alpha=alpha).mean()
+    losses_rma = losses.ewm(min_periods=rsi_n, alpha=alpha).mean()
     rs = wins_rma / losses_rma
-    df[f"RSI_{n}"] = 100.0 - (100.0 / (1.0 + rs))
+    df[f"RSI_{rsi_n}"] = 100.0 - (100.0 / (1.0 + rs))
+    df[f'RSI_EMA_{ema_n}'] = df[f"RSI_{rsi_n}"].ewm(span=ema_n, min_periods=ema_n).mean()
 
     return df
+
+
+def EMA(df: pd.DataFrame, n_list: list):
+    for n in n_list:
+        df[f'EMA_{n}'] = df.mid_c.ewm(span=n, min_periods=n).mean()
+        return df
 
 
 def MACD(df: pd.DataFrame, n_slow=26, n_fast=12, n_signal=9):
