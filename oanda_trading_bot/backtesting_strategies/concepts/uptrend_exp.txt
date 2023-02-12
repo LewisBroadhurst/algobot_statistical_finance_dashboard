@@ -1,11 +1,9 @@
 uptrend = True
-uptrend = True
 HH = 0
 HL = 0.98847
 HHs = []
 HLs = []
 confirmed_HL = 0
-LH_currentPrice_distance = 0
 
 downtrend = False
 LL = 1000
@@ -13,7 +11,6 @@ LH = 0
 LLs = []
 LHs = []
 confirmed_LH = 1000
-LH_currentPrice_distance = 0
 
 for _, row in df.iterrows():
 
@@ -27,7 +24,7 @@ for _, row in df.iterrows():
                 HLs = []
                 uptrend = True
                 confirmed_HL = HL
-                print("BOS", f'Current Price: {row.mid_c}. Uptrend: {uptrend}. Confirmed HL: {confirmed_HL}')
+                print("BOS", f'Current Price: {row.mid_c}. Uptrend: {uptrend}. Confirmed HL: {confirmed_HL}. ID: 3')
                 print(f"Confirmed HH: {HH}.")
 
         # Checking for new HH (no BOS)
@@ -50,10 +47,14 @@ for _, row in df.iterrows():
 
         # Checking for reversal BOS
         if row.mid_c < confirmed_HL:
+            print(confirmed_HL)
             uptrend = False
             downtrend = True
             LH = HH
-            print(f"REVERSAL. Current price: {row.mid_c}. \n Downtrend = {downtrend}. Uptrend = {uptrend} \n HL: {LH}")
+            confirmed_LH = HH
+            LL = row.mid_c
+            LHs = []
+            print(f"REVERSAL. Current price: {row.mid_c}. Downtrend = {downtrend}. Uptrend = {uptrend}. HL: {LH} ID:1.")
 
     if downtrend == True:
 
@@ -61,18 +62,18 @@ for _, row in df.iterrows():
         if len(LHs) > 0:
             if LL > row.mid_c:
                 LHs.sort()
-                LH = LHs[0]
+                LH = LHs[-1]
                 LHs = []
                 downtrend = True
                 confirmed_LH = LH
-                print("BOS", f'Current Price: {row.mid_c}. Downtrend: {downtrend}. Confirmed LH: {confirmed_LH}')
+                print("BOS", f'Current Price: {row.mid_c}. Downtrend: {downtrend}. Confirmed LH: {confirmed_LH}. ID:2.')
                 print(f"Confirmed LL: {LL}.")
 
         # Checking for new LL (no BOS)
         if row.mid_c < LL:
             LL = row.mid_c
             LLs.append(LL)
-            print(f"New LL: {LL}")
+        #             print(f"New LL: {LL}")
 
         # Max Dist calculation
         LH_to_LL_max_distance = LH - LL
@@ -84,11 +85,15 @@ for _, row in df.iterrows():
             LHs.append(row.mid_c)
             LHs.sort()
             LH = LHs[-1]
-            print(LH, "Current LH")
+        #             print(LH, "Current LH")
 
         # Checking for BOS
         if row.mid_c > confirmed_LH:
             uptrend = True
             downtrend = False
             HL = LL
-            print(f"REVERSAL. Current price: {row.mid_c}. Downtrend = {downtrend}. Uptrend = {uptrend}")
+            confirmed_HL = LL
+            HH = row.mid_c
+            HLs = []
+            print(
+                f"REVERSAL --> Down -> Up. Current price: {row.mid_c}. Downtrend = {downtrend}. Uptrend = {uptrend} \n")
