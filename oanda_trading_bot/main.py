@@ -10,5 +10,6 @@ if __name__ == '__main__':
     # instrumentCollection.LoadInstruments("./candle_instrument_data")
     # run_streamer()
     df = pd.read_pickle("candle_instrument_data/EUR_USD_M5.pkl")
-    df = df.iloc[950000:950500]
-    ms = MarketStructure()
+    df = df.iloc[950000:950000]
+    ms = MarketStructure(df)
+    ms.run_simulation()
