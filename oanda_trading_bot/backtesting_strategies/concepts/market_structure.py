@@ -29,9 +29,7 @@ class MarketStructure:
                 self.running_trades = 0
                 print(f'BOS. Current Price: {row.mid_c}. Uptrend: {self.uptrend}. Confirmed HH: {self.HH}. '
                       f'Confirmed HL: {self.confirmed_HL}. ID: bull_continuation.')
-
-                if self.running_trades == 0:
-                    print("TP open position(s)")
+                print("\nTP open position(s)")
 
     def new_HH(self, row):
         if row.mid_c > self.HH:
@@ -51,7 +49,7 @@ class MarketStructure:
             self.HLs.sort()
             self.HL = self.HLs[0]
 
-        if row.mid_c < fib_62_retracement_point and self.running_trades < 3:
+        if row.mid_c < fib_62_retracement_point:
             self.running_trades += 1
             return 1
 
@@ -79,8 +77,7 @@ class MarketStructure:
                 self.running_trades = 0
                 print(f'BOS. Current Price: {row.mid_c}. Downtrend: {self.downtrend}. Confirmed LL: {self.LL}.'
                       f'Confirmed LH: {self.confirmed_LH}. ID: bear_continuation.')
-                if self.running_trades == 0:
-                    print("TP open position(s)")
+                print("TP open position(s)")
 
     def new_LL(self, row):
         if row.mid_c < self.LL:
@@ -101,7 +98,7 @@ class MarketStructure:
             self.LHs.sort()
             self.LH = self.LHs[-1]
 
-        if row.mid_c > fib_62_retracement_point and self.running_trades < 3:
+        if row.mid_c > fib_62_retracement_point:
             self.running_trades += 1
             return -1
 
@@ -129,7 +126,7 @@ class MarketStructure:
             # Checking for reversal BOS
             self.reversal_check_bull(row)
 
-            if x == 1 and self.running_trades < 3:
+            if x == 1:
                 return [x, self.HL, self.HH]
 
         else:
@@ -142,7 +139,7 @@ class MarketStructure:
             # Checking for BOS
             self.reversal_checker_bear(row)
 
-            if x == -1 and self.running_trades < 3:
+            if x == -1:
                 return [x, self.LH, self.LL]
 
     def run_simulation(self):
