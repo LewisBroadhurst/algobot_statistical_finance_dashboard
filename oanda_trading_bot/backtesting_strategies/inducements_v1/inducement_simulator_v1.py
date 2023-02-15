@@ -1,9 +1,9 @@
 import pandas as pd
 import datetime as dt
 from charting.indicators import BollingerBands, RSI, ATR
-from charting.candle_patterns import apply_candle_props, apply_marubozu
-from charting.candle_plot import CandlePlot
-import plotly.graph_objects as go
+# from charting.candle_patterns import apply_candle_props, apply_marubozu
+# from charting.candle_plot import CandlePlot
+# import plotly.graph_objects as go
 
 
 class Trade:
