@@ -7,14 +7,12 @@ class MS1:
 
     def __init__(self, m5_df: pd.DataFrame):
         self.df = m5_df.copy()
-        self.trades = 0
-        self.marketStructure = MarketStructure(m5_df)
+        self.df['trade'] = 0
+        self.df['sl'] = 0
+        self.df['tp'] = 0
 
+        self.marketStructure = MarketStructure(m5_df)
         self.cp = PriceTimeChart(m5_df, "line")
-        self.cp_df = self.cp.df_plot
-        self.cp_df.row["trade"] = 0
-        self.cp_df.row["sl"] = 0
-        self.cp_df.row["tp"] = 0
 
     def run_backtest(self):
         open_trades = []
@@ -23,22 +21,26 @@ class MS1:
         for index, row in self.df.iterrows():
             x = self.marketStructure.run_uptrend_downtrend_func(row)
 
-            if x is None:
-                self.df["trade"] = 0
-                self.df["sl"] = 0
-                self.df["tp"] = 0
-                print("NONE")
-            else:
-                if x[0] == 1:
-                    print("open trade", x)
-                    self.df["trade"] = 1
-                    self.df["sl"] = x[1]
-                    self.df["tp"] = x[2]
+            if x is not None:
+                if x[0] == 1 and x[1] != 0 != x[2]:
+                    self.df.at[index, 'trade'] = x[0]
+                    self.df.at[index, 'sl'] = x[1]
+                    self.df.at[index, 'tp'] = x[2]
 
-                elif x[0] == -1:
+                elif x[0] == -1 and x[1] != 0 != x[2]:
                     print("open trade", x)
-                    self.df["trade"] = -1
-                    self.df["sl"] = x[1]
-                    self.df["tp"] = x[2]
+                    self.df.at[index, 'trade'] = x[0]
+                    self.df.at[index, 'sl'] = x[1]
+                    self.df.at[index, 'tp'] = x[2]
+
+                else:
+                    self.df.at[index, 'trade'] = 0
+                    self.df.at[index, 'sl'] = 0
+                    self.df.at[index, 'tp'] = 0
+
+            else:
+                self.df.at[index, 'trade'] = 0
+                self.df.at[index, 'sl'] = 0
+                self.df.at[index, 'tp'] = 0
 
         return self.df

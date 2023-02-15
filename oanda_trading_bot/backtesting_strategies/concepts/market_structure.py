@@ -27,9 +27,9 @@ class MarketStructure:
                 self.uptrend = True
                 self.confirmed_HL = self.HL
                 self.running_trades = 0
-                print(f'BOS. Current Price: {row.mid_c}. Uptrend: {self.uptrend}. Confirmed HH: {self.HH}. '
-                      f'Confirmed HL: {self.confirmed_HL}. ID: bull_continuation.')
-                print("\nTP open position(s)")
+                # print(f'BOS. Current Price: {row.mid_c}. Uptrend: {self.uptrend}. Confirmed HH: {self.HH}. '
+                #       f'Confirmed HL: {self.confirmed_HL}. ID: bull_continuation.')
+                # print("\nTP open position(s)")
 
     def new_HH(self, row):
         if row.mid_c > self.HH:
@@ -41,7 +41,6 @@ class MarketStructure:
         HL_to_HH_max_distance = self.HH - self.HL
         # Retracement Point calculation
         fib_38_retracement_point = self.HL + (HL_to_HH_max_distance * 0.62)
-        fib_62_retracement_point = self.HL + (HL_to_HH_max_distance * 0.38)
 
         # Checking Retracement %
         if row.mid_c < fib_38_retracement_point:
@@ -49,9 +48,12 @@ class MarketStructure:
             self.HLs.sort()
             self.HL = self.HLs[0]
 
-        if row.mid_c < fib_62_retracement_point:
-            self.running_trades += 1
-            return 1
+        if self.running_trades < 3:
+            fib_62_retracement_point = self.confirmed_HL + (HL_to_HH_max_distance * 0.25)
+            if row.mid_c < fib_62_retracement_point:
+                print(fib_62_retracement_point)
+                self.running_trades += 1
+                return 1
 
     def reversal_check_bull(self, row):
         if row.mid_c < self.confirmed_HL:
@@ -62,9 +64,9 @@ class MarketStructure:
             self.LL = row.mid_c
             self.LHs = []
             self.running_trades = 0
-            print(f"REVERSAL. Current price: {row.mid_c}. Downtrend = {self.downtrend}. "
-                  f"Uptrend = {self.uptrend}. HL: {self.LH} ID: bull_reversal.")
-            print("L(s) taken.")
+            # print(f"REVERSAL. Current price: {row.mid_c}. Downtrend = {self.downtrend}. "
+            #       f"Uptrend = {self.uptrend}. HL: {self.LH} ID: bull_reversal.")
+            # print("L(s) taken.")
 
     def bos_continuation_bear(self, row):
         if len(self.LHs) > 0:
@@ -75,9 +77,9 @@ class MarketStructure:
                 self.downtrend = True
                 self.confirmed_LH = self.LH
                 self.running_trades = 0
-                print(f'BOS. Current Price: {row.mid_c}. Downtrend: {self.downtrend}. Confirmed LL: {self.LL}.'
-                      f'Confirmed LH: {self.confirmed_LH}. ID: bear_continuation.')
-                print("TP open position(s)")
+                # print(f'BOS. Current Price: {row.mid_c}. Downtrend: {self.downtrend}. Confirmed LL: {self.LL}.'
+                #       f'Confirmed LH: {self.confirmed_LH}. ID: bear_continuation.')
+                # print("TP open position(s)")
 
     def new_LL(self, row):
         if row.mid_c < self.LL:
@@ -90,17 +92,18 @@ class MarketStructure:
         LH_to_LL_max_distance = self.LH - self.LL
         # Retracement Point calculation
         fib_38_retracement_point = self.LL + (LH_to_LL_max_distance * 0.38)
-        fib_62_retracement_point = self.LL + (LH_to_LL_max_distance * 0.62)
-
         # Checking Retracement %
         if row.mid_c > fib_38_retracement_point:
             self.LHs.append(row.mid_c)
             self.LHs.sort()
             self.LH = self.LHs[-1]
 
-        if row.mid_c > fib_62_retracement_point:
-            self.running_trades += 1
-            return -1
+        if self.running_trades < 3:
+            fib_62_retracement_point = self.confirmed_LH - (LH_to_LL_max_distance * 0.25)
+            if row.mid_c > fib_62_retracement_point:
+                print("ME", self.confirmed_LH, fib_62_retracement_point)
+                self.running_trades += 1
+                return -1
 
     def reversal_checker_bear(self, row):
         if row.mid_c > self.confirmed_LH:
@@ -111,9 +114,9 @@ class MarketStructure:
             self.HH = row.mid_c
             self.HLs = []
             self.running_trades = 0
-            print(f"REVERSAL. Current price: {row.mid_c}. Downtrend = {self.downtrend}. "
-                  f"Uptrend = {self.uptrend}. LH: {self.LH}. ID: bear_reversal")
-            print("L(s) taken.")
+            # print(f"REVERSAL. Current price: {row.mid_c}. Downtrend = {self.downtrend}. "
+            #       f"Uptrend = {self.uptrend}. LH: {self.LH}. ID: bear_reversal")
+            # print("L(s) taken.")
 
     def run_uptrend_downtrend_func(self, row):
         if self.uptrend is True:
@@ -127,7 +130,7 @@ class MarketStructure:
             self.reversal_check_bull(row)
 
             if x == 1:
-                return [x, self.HL, self.HH]
+                return [x, self.confirmed_HL, self.HH]
 
         else:
             # Checking for continuation BOS
@@ -140,7 +143,7 @@ class MarketStructure:
             self.reversal_checker_bear(row)
 
             if x == -1:
-                return [x, self.LH, self.LL]
+                return [x, self.confirmed_LH, self.LL]
 
     def run_simulation(self):
 
