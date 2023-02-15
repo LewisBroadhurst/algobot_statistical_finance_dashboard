@@ -3,7 +3,7 @@
 # from stream_example.streamer import run_streamer
 import pandas as pd
 
-from charting.market_structure import MarketStructure
+from backtesting_strategies.concepts.market_structure import MarketStructure
 
 if __name__ == '__main__':
     # api = OandaApi()

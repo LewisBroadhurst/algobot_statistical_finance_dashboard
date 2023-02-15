@@ -19,16 +19,16 @@ class InducementSimulatorV1:
 
     def __init__(self, entry_df: pd.DataFrame):
         self.df = entry_df.copy()
-        self.df = apply_candle_props(self.df)
+        # self.df = apply_candle_props(self.df)
         # self.df = BollingerBands(self.df)
         # self.df = RSI(self.df, 10)
-        self.df = ATR(self.df, 7)
-        self.df["sTime"] = [dt.datetime.strftime(x, "s%y-%m-%d %H:%M") for x in self.df.time]
-        self.df["OB"] = self.df.apply(apply_marubozu, axis=1)
+        # self.df = ATR(self.df, 7)
+        # self.df["sTime"] = [dt.datetime.strftime(x, "s%y-%m-%d %H:%M") for x in self.df.time]
+        # self.df["OB"] = self.df.apply(apply_marubozu, axis=1)
 
-        self.df_merge = None
-        self.cp = None
-        self.cp_df = None
+        # self.df_merge = None
+        # self.cp = None
+        # self.cp_df = None
 
         self.pdh = 0
         self.pdl = 0
