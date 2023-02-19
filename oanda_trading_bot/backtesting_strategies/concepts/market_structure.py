@@ -1,17 +1,24 @@
 class MarketStructure:
 
-    def __init__(self, df):
+    def __init__(self, df, start_bullish_or_bearish):
         self.df = df.copy()
         self.running_trades = 0
+        self.uptrend = None
+        self.downtrend = None
 
-        self.uptrend = True
+        if start_bullish_or_bearish == 'bullish':
+            self.uptrend = True
+            self.downtrend = False
+        else:
+            self.uptrend = False
+            self.downtrend = True
+
         self.HH = 0
         self.HL = 0.98847
         self.HHs = []
         self.HLs = []
         self.confirmed_HL = 0
 
-        self.downtrend = False
         self.LL = 1000
         self.LH = 0
         self.LLs = []
