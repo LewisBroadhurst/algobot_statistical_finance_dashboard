@@ -1,22 +1,23 @@
 import pandas as pd
 from backtesting_strategies.concepts.market_structure import MarketStructure
 from charting.price_time_chart import PriceTimeChart
+from models.trade import Trade
 
 
 class MS1:
 
-    def __init__(self, m5_df: pd.DataFrame):
+    def __init__(self, m5_df: pd.DataFrame, start_bullish_or_bearish: str):
         self.df = m5_df.copy()
+        self.start_bullish_or_bearish = start_bullish_or_bearish
+
         self.df['trade'] = 0
         self.df['sl'] = 0
         self.df['tp'] = 0
 
-        self.marketStructure = MarketStructure(m5_df)
+        self.marketStructure = MarketStructure(m5_df, start_bullish_or_bearish)
         self.cp = PriceTimeChart(m5_df, "line")
 
-    def run_backtest(self):
-        open_trades = []
-        closed_trades = []
+    def prepare_data(self):
 
         for index, row in self.df.iterrows():
             x = self.marketStructure.run_uptrend_downtrend_func(row)
